@@ -297,6 +297,74 @@
     }
   }
 
+  /* 首次进入欢迎广告 */
+  #welcome-ad {
+    position: absolute;
+    inset: 0;
+    z-index: 50;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background: rgba(255, 242, 220, .96);
+    transition: opacity .45s ease, visibility .45s ease;
+  }
+  #welcome-ad.hide {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+  .welcome-card {
+    width: min(88vw, 520px);
+    padding: clamp(34px, 7vmin, 64px) clamp(24px, 6vmin, 54px);
+    text-align: center;
+    background: rgba(255, 255, 255, .46);
+    border: 2px solid rgba(255, 180, 0, .7);
+    box-shadow: 0 24px 70px rgba(135, 131, 126, .18);
+    clip-path: polygon(18px 0, calc(100% - 18px) 0, 100% 18px,
+                       100% calc(100% - 18px), calc(100% - 18px) 100%,
+                       18px 100%, 0 calc(100% - 18px), 0 18px);
+  }
+  .welcome-eyebrow {
+    margin-bottom: 16px;
+    color: var(--gray);
+    font-size: clamp(12px, 2vmin, 15px);
+    font-weight: 700;
+    letter-spacing: .35em;
+  }
+  .welcome-title {
+    color: var(--gray);
+    font-size: clamp(32px, 7vmin, 62px);
+    font-weight: 900;
+    line-height: 1.15;
+  }
+  .welcome-title strong { color: var(--amber); }
+  .welcome-copy {
+    margin: 18px auto 28px;
+    color: var(--gray);
+    font-size: clamp(14px, 2.2vmin, 17px);
+    line-height: 1.8;
+  }
+  #welcome-enter {
+    min-width: 172px;
+    padding: 14px 28px;
+    border: 0;
+    color: #765f41;
+    background: var(--amber);
+    clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 10px,
+                       100% calc(100% - 10px), calc(100% - 10px) 100%,
+                       10px 100%, 0 calc(100% - 10px), 0 10px);
+    font: 800 16px/1 "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    letter-spacing: .12em;
+    cursor: pointer;
+    transition: transform .18s ease, filter .18s ease;
+  }
+  #welcome-enter:hover { filter: brightness(1.05); }
+  #welcome-enter:active { transform: scale(.96); }
+  #welcome-enter:focus-visible {
+    outline: 3px solid rgba(62, 123, 250, .38);
+    outline-offset: 4px;
+  }
+
   /* 开始遮罩（首次点击解锁音频） */
   #overlay {
     position: absolute;
@@ -381,8 +449,28 @@
       <div class="title">大狗<em>叫</em></div>
       <div class="sub">点 击 任 意 位 置 开 始</div>
     </div>
+
+    <div id="welcome-ad" role="dialog" aria-modal="true" aria-labelledby="welcome-title">
+      <div class="welcome-card">
+        <div class="welcome-eyebrow">WELCOME</div>
+        <h1 id="welcome-title" class="welcome-title">欢迎来用 <strong>LovBrowser</strong></h1>
+        <p class="welcome-copy">打开创意，马上和大狗一起玩。</p>
+        <button id="welcome-enter" type="button">进入大狗叫</button>
+      </div>
+    </div>
   </div>
 
+  <script>
+    const welcomeAd = document.getElementById('welcome-ad');
+    const welcomeEnter = document.getElementById('welcome-enter');
+    welcomeAd.addEventListener('pointerdown', (event) => event.stopPropagation());
+    welcomeEnter.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      welcomeAd.classList.add('hide');
+      window.setTimeout(() => { welcomeAd.hidden = true; }, 450);
+    });
+  </script>
   <script src="audio-data.js"></script>
   <script src="main.js"></script>
 </body>
