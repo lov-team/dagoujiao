@@ -1,5 +1,11 @@
 # 大狗叫
 
+> ### 🚀 欢迎来用 LovBrowser
+>
+> 为 AI 工作流打造的智能浏览器，让浏览、创作和开发更简单。
+>
+> **[立即体验 LovBrowser →](https://lovbrowser.com)**
+
 一个可以点击、拖动互动的大狗叫静态网页，首次进入会展示 LovBrowser 欢迎页，并包含狗叫音效、弹性缩放和全屏粒子特效。
 
 线上演示：[http://47.128.78.22/dagoujiao/](http://47.128.78.22/dagoujiao/)
