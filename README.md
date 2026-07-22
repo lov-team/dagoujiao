@@ -27,6 +27,10 @@ Then open [http://127.0.0.1:4173/](http://127.0.0.1:4173/). The first interactio
 | `audio-data.js` | Embedded dog-bark audio data |
 | `Image/` | Closed- and open-mouth artwork |
 
+## Acknowledgments
+
+With appreciation to [马克杯MarkCup](https://space.bilibili.com/357762853) and the video [点击即玩世界上最爽的哈基米模拟器](https://www.bilibili.com/video/BV1kNKU6REBg/), which inspired this project.
+
 ## License
 
 This project uses the [MIT License](./LICENSE), followed by a non-restrictive additional notice.

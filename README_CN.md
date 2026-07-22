@@ -27,6 +27,10 @@ python3 -m http.server 4173
 | `audio-data.js` | 内嵌狗叫音频数据 |
 | `Image/` | 闭嘴与张嘴状态素材 |
 
+## 鸣谢
+
+感谢 [马克杯MarkCup](https://space.bilibili.com/357762853) 创作的 [《点击即玩世界上最爽的哈基米模拟器》](https://www.bilibili.com/video/BV1kNKU6REBg/)，本项目向该作品致敬。
+
 ## 开源协议
 
 本项目采用 [MIT License](./LICENSE)。许可证末尾包含一条非限制性附加声明。
