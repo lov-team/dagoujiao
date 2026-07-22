@@ -2,7 +2,7 @@
 
 一个可以点击、拖动互动的大狗叫静态网页，首次进入会展示 LovBrowser 欢迎页，并包含狗叫音效、弹性缩放和全屏粒子特效。
 
-线上演示：[https://fuck-claude.ai/?a=niubility](https://fuck-claude.ai/?a=niubility)
+线上演示：[https://fuck-claude.ai/?a=openai-niubility](https://fuck-claude.ai/?a=openai-niubility)
 
 ![大狗叫预览](./preview.png)
 
