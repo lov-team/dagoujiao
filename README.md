@@ -6,7 +6,7 @@ An interactive dog-bark webpage with Chinese and English UI, dog-bark sound effe
 
 ## Live demo
 
-[https://fuck-claude.ai](https://fuck-claude.ai)
+[https://fuck-claude.ai/?a=openai-niubility](https://fuck-claude.ai/?a=openai-niubility)
 
 ![Dog Bark preview](./preview.png)
 

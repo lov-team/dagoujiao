@@ -6,7 +6,7 @@
 
 ## 在线演示
 
-[https://fuck-claude.ai](https://fuck-claude.ai)
+[https://fuck-claude.ai/?a=openai-niubility](https://fuck-claude.ai/?a=openai-niubility)
 
 ![大狗叫预览](./preview.png)
 
