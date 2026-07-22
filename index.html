@@ -130,6 +130,42 @@
     100% { opacity: 0; }
   }
 
+  /* 点击文字：旧文字上浮淡出，最外层定位与内层抖动互不覆盖。 */
+  #click-text-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 8;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .click-claude {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    animation: claudeTextFade .9s ease-out forwards;
+  }
+  .click-claude-float {
+    display: block;
+    animation: claudeTextRise .9s cubic-bezier(.16, .72, .28, 1) forwards;
+  }
+  .click-claude-copy {
+    display: block;
+    color: var(--coral);
+    font: 900 clamp(22px, 4.2vmin, 42px)/1 "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    letter-spacing: .03em;
+    white-space: nowrap;
+    text-shadow: 0 3px 0 var(--amber), 0 9px 20px rgba(135, 131, 126, .3);
+    transform-origin: 50% 58%;
+    will-change: transform;
+  }
+  @keyframes claudeTextFade {
+    0%, 62% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+  @keyframes claudeTextRise {
+    from { transform: translateY(0); }
+    to { transform: translateY(-72px); }
+  }
+
   /* 大狗 */
   #dog {
     position: absolute;
@@ -406,6 +442,7 @@
       </span>
     </a>
     <div id="zoneflash"></div>
+    <div id="click-text-layer" aria-hidden="true"></div>
 
     <div id="dog">
       <div id="dog-inner">
