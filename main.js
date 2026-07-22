@@ -119,6 +119,7 @@ const fx2d      = fxCanvas.getContext('2d');
 const topControls = document.getElementById('top-controls');
 const musicToggle = document.getElementById('music-toggle');
 const sfxToggle = document.getElementById('sfx-toggle');
+const languageToggle = document.getElementById('language-toggle');
 const videoButton = document.getElementById('video-button');
 const authorLink = document.getElementById('author-link');
 const reduceUiMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -176,8 +177,16 @@ function restoreAfterNavigation() {
   if (navigationMuted) setNavigationMute(false);
 }
 
-function updateMuteButton(button, muted, label) {
-  const action = muted ? '开启' : '关闭';
+function uiText(key) {
+  if (window.dagouI18n && typeof window.dagouI18n.t === 'function') {
+    return window.dagouI18n.t(key);
+  }
+  return { music: '音乐', soundEffects: '音效', turnOn: '开启', turnOff: '关闭' }[key] || key;
+}
+
+function updateMuteButton(button, muted, labelKey) {
+  const action = uiText(muted ? 'turnOn' : 'turnOff');
+  const label = uiText(labelKey);
   button.classList.toggle('is-muted', muted);
   button.setAttribute('aria-pressed', String(muted));
   button.setAttribute('aria-label', `${action}${label}`);
@@ -187,13 +196,13 @@ function updateMuteButton(button, muted, label) {
 function toggleMusic() {
   bgmMuted = !bgmMuted;
   setBusMuted(bgmBus, bgmMuted);
-  updateMuteButton(musicToggle, bgmMuted, '音乐');
+  updateMuteButton(musicToggle, bgmMuted, 'music');
 }
 
 function toggleSoundEffects() {
   sfxMuted = !sfxMuted;
   setBusMuted(sfxBus, sfxMuted);
-  updateMuteButton(sfxToggle, sfxMuted, '音效');
+  updateMuteButton(sfxToggle, sfxMuted, 'soundEffects');
 
   if (sfxMuted) {
     dogInner.classList.remove('bark-image');
@@ -242,6 +251,7 @@ function updateUiRhythm(beatPosition) {
   if (!Number.isFinite(beatPosition)) {
     setRhythmScale(musicToggle, 0, 0.075);
     setRhythmScale(sfxToggle, 0, 0.075);
+    setRhythmScale(languageToggle, 0, 0.075);
     setRhythmScale(videoButton, 0, 0.075);
     authorLink.style.setProperty('--author-rhythm-scale', '1');
     authorLink.style.setProperty('--author-lift', '0px');
@@ -266,6 +276,7 @@ function updateUiRhythm(beatPosition) {
 
   setRhythmScale(musicToggle, musicPulse, 0.075);
   setRhythmScale(sfxToggle, sfxPulse, 0.075);
+  setRhythmScale(languageToggle, pulse, 0.075);
   setRhythmScale(videoButton, pulse, 0.075);
   authorLink.style.setProperty(
     '--author-rhythm-scale',
@@ -278,31 +289,16 @@ function updateUiRhythm(beatPosition) {
   updateAuthorNameLetters(beatIndex, pulse);
 }
 
-async function navigateWithToy(type, id, fallbackUrl, label) {
-  try {
-    if (window.toy && typeof window.toy.navigate === 'function') {
-      await window.toy.navigate({ type, id });
-      return;
-    }
-  } catch (error) {
-    console.warn(`[大狗Tap] Toy ${label}导航不可用，改用浏览器跳转。`, error);
-  }
-  window.location.assign(fallbackUrl);
+function openExternal(url) {
+  window.open(url, '_blank', 'noopener,noreferrer');
 }
 
 function openCreatorSpace() {
-  setNavigationMute(true);
-  return navigateWithToy('space', CREATOR_MID, CREATOR_URL, '主页');
+  openExternal(CREATOR_URL);
 }
 
 function openFeaturedVideo() {
-  setNavigationMute(true);
-  return navigateWithToy(
-    'video',
-    FEATURED_BVID,
-    FEATURED_VIDEO_URL,
-    '视频'
-  );
+  openExternal(FEATURED_VIDEO_URL);
 }
 
 for (const button of topControls.querySelectorAll('button')) {
@@ -324,6 +320,10 @@ for (const button of topControls.querySelectorAll('button')) {
 musicToggle.addEventListener('click', toggleMusic);
 sfxToggle.addEventListener('click', toggleSoundEffects);
 videoButton.addEventListener('click', openFeaturedVideo);
+document.addEventListener('dagou:languagechange', () => {
+  updateMuteButton(musicToggle, bgmMuted, 'music');
+  updateMuteButton(sfxToggle, sfxMuted, 'soundEffects');
+});
 
 for (const eventName of ['pointerdown', 'pointermove', 'pointerup']) {
   authorLink.addEventListener(eventName, (event) => event.stopPropagation());
@@ -2247,7 +2247,7 @@ if (window.ResizeObserver) {
 
 buildGrid();
 fxResize();
-updateMuteButton(musicToggle, bgmMuted, '音乐');
-updateMuteButton(sfxToggle, sfxMuted, '音效');
+updateMuteButton(musicToggle, bgmMuted, 'music');
+updateMuteButton(sfxToggle, sfxMuted, 'soundEffects');
 showControls();
 requestAnimationFrame(tick);
