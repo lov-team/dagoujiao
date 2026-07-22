@@ -307,6 +307,10 @@
     display: none;
     color: #765f41;
   }
+  #github-button {
+    --btn-edge: rgba(22, 194, 163, .78);
+    color: #147e6a;
+  }
   @media (max-width: 430px) {
     #top-controls {
       top: max(10px, env(safe-area-inset-top));
@@ -424,6 +428,67 @@
     outline-offset: 4px;
   }
 
+  /* 互动达成后邀请用户访问 GitHub 项目，由用户自行决定是否点 Star。 */
+  #github-modal {
+    position: absolute;
+    inset: 0;
+    z-index: 60;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background: rgba(79, 73, 66, .38);
+    backdrop-filter: blur(5px);
+  }
+  #github-modal[hidden] { display: none; }
+  .github-card {
+    width: min(88vw, 460px);
+    padding: clamp(30px, 6vmin, 48px);
+    text-align: center;
+    background: rgba(255, 250, 240, .98);
+    border: 2px solid rgba(22, 194, 163, .72);
+    box-shadow: 0 24px 70px rgba(79, 73, 66, .28);
+    clip-path: polygon(18px 0, calc(100% - 18px) 0, 100% 18px,
+                       100% calc(100% - 18px), calc(100% - 18px) 100%,
+                       18px 100%, 0 calc(100% - 18px), 0 18px);
+  }
+  .github-card h2 {
+    color: var(--gray);
+    font-size: clamp(26px, 5vmin, 42px);
+    line-height: 1.15;
+  }
+  .github-card p {
+    margin: 16px auto 26px;
+    color: var(--gray);
+    font-size: clamp(14px, 2.2vmin, 17px);
+    line-height: 1.75;
+  }
+  .github-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+  .github-modal-button {
+    min-height: 44px;
+    padding: 12px 18px;
+    border: 0;
+    color: #075f50;
+    background: var(--teal);
+    clip-path: polygon(9px 0, calc(100% - 9px) 0, 100% 9px,
+                       100% calc(100% - 9px), calc(100% - 9px) 100%,
+                       9px 100%, 0 calc(100% - 9px), 0 9px);
+    font: 800 14px/1 "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    cursor: pointer;
+  }
+  .github-modal-button.secondary {
+    color: var(--gray);
+    background: rgba(135, 131, 126, .16);
+  }
+  .github-modal-button:focus-visible {
+    outline: 3px solid rgba(62, 123, 250, .5);
+    outline-offset: 3px;
+  }
+
   /* 开始遮罩（首次点击解锁音频） */
   #overlay {
     position: absolute;
@@ -500,6 +565,12 @@
         <button id="language-toggle" class="control-button language-toggle" type="button" aria-label="切换为英文" title="切换为英文">
           <span class="language-label">EN</span>
         </button>
+        <button id="github-button" class="control-button" type="button" aria-label="在 GitHub 查看项目" data-i18n-aria-label="githubButtonLabel">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path fill="currentColor" d="M12 2a10 10 0 00-3.16 19.49c.5.09.68-.22.68-.48v-1.69c-2.78.61-3.37-1.18-3.37-1.18-.46-1.15-1.11-1.46-1.11-1.46-.91-.61.07-.6.07-.6 1 .07 1.53 1.01 1.53 1.01.9 1.51 2.35 1.08 2.92.83.09-.64.35-1.08.64-1.33-2.22-.25-4.56-1.1-4.56-4.89 0-1.08.39-1.96 1.03-2.65-.1-.25-.45-1.26.1-2.62 0 0 .84-.27 2.75 1.01A9.55 9.55 0 0112 6.8c.85 0 1.7.11 2.5.34 1.91-1.28 2.75-1.01 2.75-1.01.55 1.36.2 2.37.1 2.62.64.69 1.03 1.57 1.03 2.65 0 3.8-2.34 4.64-4.57 4.89.36.31.68.9.68 1.82v2.7c0 .27.18.58.69.48A10 10 0 0012 2z" />
+          </svg>
+          <span data-i18n="github">GitHub</span>
+        </button>
         <button id="video-button" class="control-button" type="button" aria-label="打开哔哩哔哩视频 BV1kNKU6REBg" data-i18n-aria-label="featuredVideoLabel">
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <rect x="3" y="5" width="18" height="14" rx="3" />
@@ -526,6 +597,17 @@
         <button id="welcome-enter" type="button" data-i18n="enterGame">进入大狗叫</button>
       </div>
     </div>
+
+    <div id="github-modal" role="dialog" aria-modal="true" aria-labelledby="github-modal-title" hidden>
+      <div class="github-card">
+        <h2 id="github-modal-title" data-i18n="githubModalTitle">汪！已经互动 20 次</h2>
+        <p data-i18n="githubModalCopy">喜欢大狗叫的话，去 GitHub 给项目点个 Star 吧。</p>
+        <div class="github-actions">
+          <button id="github-modal-open" class="github-modal-button" type="button" data-i18n="githubModalOpen">前往 GitHub 点 Star</button>
+          <button id="github-modal-close" class="github-modal-button secondary" type="button" data-i18n="githubModalClose">稍后再说</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -536,6 +618,8 @@
           controlsLabel: '声音与导航控制',
           music: '音乐',
           soundEffects: '音效',
+          github: 'GitHub',
+          githubButtonLabel: '在 GitHub 查看项目',
           video: '视频',
           featuredVideoLabel: '打开哔哩哔哩视频 BV1kNKU6REBg',
           creatorPageLabel: '打开作者哔哩哔哩主页',
@@ -550,12 +634,18 @@
           turnOff: '关闭',
           switchLanguage: '切换为英文',
           languageButton: 'EN',
+          githubModalTitle: '汪！已经互动 20 次',
+          githubModalCopy: '喜欢大狗叫的话，去 GitHub 给项目点个 Star 吧。',
+          githubModalOpen: '前往 GitHub 点 Star',
+          githubModalClose: '稍后再说',
         },
         en: {
           pageTitle: 'Dog Bark',
           controlsLabel: 'Sound and navigation controls',
           music: 'Music',
           soundEffects: 'Sound effects',
+          github: 'GitHub',
+          githubButtonLabel: 'View this project on GitHub',
           video: 'Video',
           featuredVideoLabel: 'Open Bilibili video BV1kNKU6REBg',
           creatorPageLabel: "Open the creator's Bilibili page",
@@ -570,6 +660,10 @@
           turnOff: 'Turn off ',
           switchLanguage: '切换为中文',
           languageButton: '中文',
+          githubModalTitle: 'Woof! 20 barks unlocked',
+          githubModalCopy: 'Enjoying Dog Bark? Visit GitHub and give the project a Star.',
+          githubModalOpen: 'Star on GitHub',
+          githubModalClose: 'Maybe later',
         },
       };
       const languageToggles = document.querySelectorAll('.language-toggle');

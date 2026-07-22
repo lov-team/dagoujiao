@@ -90,10 +90,12 @@ let lastCommittedInputTime = -Infinity;
 const pointers = new Map();// pointerId -> { zone, voice, pendingEntryId, lastX, lastY }
 const CONTROLS_IDLE_MS = 2000;
 const CONTROLS_HOVER_IDLE_MS = 250;
+const PROJECT_INTERACTION_TARGET = 20;
 const CREATOR_MID = '357762853';
 const CREATOR_URL = `https://space.bilibili.com/${CREATOR_MID}`;
 const FEATURED_BVID = 'BV1kNKU6REBg';
 const FEATURED_VIDEO_URL = `https://www.bilibili.com/video/${FEATURED_BVID}/`;
+const PROJECT_URL = 'https://github.com/lov-team/dagoujiao';
 const NAVIGATION_MUTE_KEY = 'dagou-navigation-muted';
 let controlsIdleTimer = 0;
 let navigationMuted = false;
@@ -120,9 +122,15 @@ const topControls = document.getElementById('top-controls');
 const musicToggle = document.getElementById('music-toggle');
 const sfxToggle = document.getElementById('sfx-toggle');
 const languageToggle = document.getElementById('language-toggle');
+const githubButton = document.getElementById('github-button');
 const videoButton = document.getElementById('video-button');
+const githubModal = document.getElementById('github-modal');
+const githubModalOpen = document.getElementById('github-modal-open');
+const githubModalClose = document.getElementById('github-modal-close');
 const authorLink = document.getElementById('author-link');
 const reduceUiMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+let projectInteractionCount = 0;
+let projectPromptShown = false;
 
 function showControls() {
   if (pointers.size > 0 || holding) return;
@@ -252,6 +260,7 @@ function updateUiRhythm(beatPosition) {
     setRhythmScale(musicToggle, 0, 0.075);
     setRhythmScale(sfxToggle, 0, 0.075);
     setRhythmScale(languageToggle, 0, 0.075);
+    setRhythmScale(githubButton, 0, 0.075);
     setRhythmScale(videoButton, 0, 0.075);
     authorLink.style.setProperty('--author-rhythm-scale', '1');
     authorLink.style.setProperty('--author-lift', '0px');
@@ -277,6 +286,7 @@ function updateUiRhythm(beatPosition) {
   setRhythmScale(musicToggle, musicPulse, 0.075);
   setRhythmScale(sfxToggle, sfxPulse, 0.075);
   setRhythmScale(languageToggle, pulse, 0.075);
+  setRhythmScale(githubButton, pulse, 0.075);
   setRhythmScale(videoButton, pulse, 0.075);
   authorLink.style.setProperty(
     '--author-rhythm-scale',
@@ -301,6 +311,29 @@ function openFeaturedVideo() {
   openExternal(FEATURED_VIDEO_URL);
 }
 
+function openProjectOnGitHub() {
+  openExternal(PROJECT_URL);
+}
+
+function closeProjectPrompt() {
+  githubModal.hidden = true;
+  githubButton.focus();
+}
+
+function showProjectPrompt() {
+  projectPromptShown = true;
+  githubModal.hidden = false;
+  githubModalOpen.focus();
+}
+
+function recordProjectInteraction() {
+  if (projectPromptShown) return;
+  projectInteractionCount += 1;
+  if (projectInteractionCount >= PROJECT_INTERACTION_TARGET) {
+    showProjectPrompt();
+  }
+}
+
 for (const button of topControls.querySelectorAll('button')) {
   button.addEventListener('pointerenter', (event) => {
     if (event.pointerType === 'mouse') accelerateControlsReveal();
@@ -319,7 +352,14 @@ for (const button of topControls.querySelectorAll('button')) {
 }
 musicToggle.addEventListener('click', toggleMusic);
 sfxToggle.addEventListener('click', toggleSoundEffects);
+githubButton.addEventListener('click', openProjectOnGitHub);
 videoButton.addEventListener('click', openFeaturedVideo);
+githubModal.addEventListener('pointerdown', (event) => event.stopPropagation());
+githubModalOpen.addEventListener('click', openProjectOnGitHub);
+githubModalClose.addEventListener('click', closeProjectPrompt);
+window.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && !githubModal.hidden) closeProjectPrompt();
+});
 document.addEventListener('dagou:languagechange', () => {
   updateMuteButton(musicToggle, bgmMuted, 'music');
   updateMuteButton(sfxToggle, sfxMuted, 'soundEffects');
@@ -2158,10 +2198,12 @@ stage.addEventListener('pointerdown', (e) => {
     });
     hideControlsUntilIdle();
     start();
+    recordProjectInteraction();
     return;
   }
   if (ctx.state === 'suspended') ctx.resume().catch(() => {});
   spawnClaudeText(e.clientX, e.clientY);
+  recordProjectInteraction();
   try { stage.setPointerCapture(e.pointerId); } catch (_) { /* 某些旧浏览器不支持 */ }
   pointers.set(
     e.pointerId,
