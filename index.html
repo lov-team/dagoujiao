@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 <meta name="theme-color" content="#fff2dc" />
-<title>大狗叫</title>
+<title>大狗叫 / Dog Bark</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐶</text></svg>" />
 <style>
   /* 全页面限定调色板：米白底 + 主色黄 + 次色灰（极少点缀色） */
@@ -318,6 +318,7 @@
       padding-inline: 10px;
     }
     .control-button span { display: none; }
+    #language-toggle .language-label { display: inline; }
     #author-link {
       right: max(10px, env(safe-area-inset-right));
       bottom: max(10px, env(safe-area-inset-bottom));
@@ -350,6 +351,7 @@
     pointer-events: none;
   }
   .welcome-card {
+    position: relative;
     width: min(88vw, 520px);
     padding: clamp(34px, 7vmin, 64px) clamp(24px, 6vmin, 54px);
     text-align: center;
@@ -359,6 +361,27 @@
     clip-path: polygon(18px 0, calc(100% - 18px) 0, 100% 18px,
                        100% calc(100% - 18px), calc(100% - 18px) 100%,
                        18px 100%, 0 calc(100% - 18px), 0 18px);
+  }
+  .welcome-language-toggle {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    min-width: 44px;
+    min-height: 36px;
+    padding: 7px 10px;
+    border: 1px solid rgba(135, 131, 126, .55);
+    color: var(--gray);
+    background: rgba(255, 242, 220, .76);
+    clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 8px,
+                       100% calc(100% - 8px), calc(100% - 8px) 100%,
+                       8px 100%, 0 calc(100% - 8px), 0 8px);
+    font: 700 13px/1 "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    cursor: pointer;
+  }
+  .welcome-language-toggle:hover { color: #d88f00; }
+  .welcome-language-toggle:focus-visible {
+    outline: 3px solid rgba(62, 123, 250, .38);
+    outline-offset: 3px;
   }
   .welcome-eyebrow {
     margin-bottom: 16px;
@@ -435,7 +458,7 @@
 <body>
   <div id="stage">
     <canvas id="fx"></canvas>
-    <a id="author-link" href="https://space.bilibili.com/357762853" aria-label="打开作者哔哩哔哩主页">
+    <a id="author-link" href="https://space.bilibili.com/357762853" aria-label="打开作者哔哩哔哩主页" data-i18n-aria-label="creatorPageLabel">
       <span class="author-copy" aria-hidden="true">
         <span class="author-label">Created by</span>
         <span class="author-name">MarkCup</span>
@@ -453,7 +476,7 @@
       </div>
     </div>
 
-    <div id="top-controls" class="is-visible" aria-label="声音与导航控制">
+    <div id="top-controls" class="is-visible" aria-label="声音与导航控制" data-i18n-aria-label="controlsLabel">
       <div id="audio-controls" class="control-group">
         <button id="music-toggle" class="control-button" type="button" aria-label="关闭音乐" aria-pressed="false">
           <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -462,7 +485,7 @@
             <circle cx="16" cy="16" r="3" />
             <path class="mute-slash" d="M4 3l16 18" />
           </svg>
-          <span>音乐</span>
+          <span data-i18n="music">音乐</span>
         </button>
         <button id="sfx-toggle" class="control-button" type="button" aria-label="关闭音效" aria-pressed="false">
           <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -470,34 +493,139 @@
             <path d="M17 9.5a4 4 0 010 5" />
             <path class="mute-slash" d="M4 3l16 18" />
           </svg>
-          <span>音效</span>
+          <span data-i18n="soundEffects">音效</span>
         </button>
       </div>
-      <button id="video-button" class="control-button" type="button" aria-label="打开哔哩哔哩视频 BV1kNKU6REBg">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <rect x="3" y="5" width="18" height="14" rx="3" />
-          <path d="M10 9l5 3-5 3z" />
-        </svg>
-        <span>视频</span>
-      </button>
+      <div class="control-group">
+        <button id="language-toggle" class="control-button language-toggle" type="button" aria-label="切换为英文" title="切换为英文">
+          <span class="language-label">EN</span>
+        </button>
+        <button id="video-button" class="control-button" type="button" aria-label="打开哔哩哔哩视频 BV1kNKU6REBg" data-i18n-aria-label="featuredVideoLabel">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="3" y="5" width="18" height="14" rx="3" />
+            <path d="M10 9l5 3-5 3z" />
+          </svg>
+          <span data-i18n="video">视频</span>
+        </button>
+      </div>
     </div>
 
     <div id="overlay">
-      <div class="title">大狗<em>叫</em></div>
-      <div class="sub">点 击 任 意 位 置 开 始</div>
+      <div class="title" data-i18n="gameTitle">大狗叫</div>
+      <div class="sub" data-i18n="startPrompt">点 击 任 意 位 置 开 始</div>
     </div>
 
     <div id="welcome-ad" role="dialog" aria-modal="true" aria-labelledby="welcome-title">
       <div class="welcome-card">
-        <div class="welcome-eyebrow">WELCOME</div>
-        <h1 id="welcome-title" class="welcome-title">欢迎来用 <strong>LovBrowser</strong></h1>
-        <p class="welcome-copy">打开创意，马上和大狗一起玩。</p>
-        <button id="welcome-enter" type="button">进入大狗叫</button>
+        <button id="welcome-language-toggle" class="welcome-language-toggle language-toggle" type="button" aria-label="切换为英文" title="切换为英文">
+          <span class="language-label">EN</span>
+        </button>
+        <div class="welcome-eyebrow" data-i18n="welcomeEyebrow">欢迎</div>
+        <h1 id="welcome-title" class="welcome-title" data-i18n="welcomeTitle">打开创意</h1>
+        <p class="welcome-copy" data-i18n="welcomeCopy">马上和大狗一起玩。</p>
+        <button id="welcome-enter" type="button" data-i18n="enterGame">进入大狗叫</button>
       </div>
     </div>
   </div>
 
   <script>
+    (() => {
+      const translations = {
+        zh: {
+          pageTitle: '大狗叫',
+          controlsLabel: '声音与导航控制',
+          music: '音乐',
+          soundEffects: '音效',
+          video: '视频',
+          featuredVideoLabel: '打开哔哩哔哩视频 BV1kNKU6REBg',
+          creatorPageLabel: '打开作者哔哩哔哩主页',
+          gameTitle: '大狗叫',
+          startPrompt: '点 击 任 意 位 置 开 始',
+          welcomeEyebrow: '欢迎',
+          welcomeTitle: '打开创意',
+          welcomeCopy: '马上和大狗一起玩。',
+          enterGame: '进入大狗叫',
+          dogAlt: '大狗',
+          turnOn: '开启',
+          turnOff: '关闭',
+          switchLanguage: '切换为英文',
+          languageButton: 'EN',
+        },
+        en: {
+          pageTitle: 'Dog Bark',
+          controlsLabel: 'Sound and navigation controls',
+          music: 'Music',
+          soundEffects: 'Sound effects',
+          video: 'Video',
+          featuredVideoLabel: 'Open Bilibili video BV1kNKU6REBg',
+          creatorPageLabel: "Open the creator's Bilibili page",
+          gameTitle: 'Dog Bark',
+          startPrompt: 'TAP ANYWHERE TO START',
+          welcomeEyebrow: 'WELCOME',
+          welcomeTitle: 'Unleash Your Creativity',
+          welcomeCopy: 'Play with the dog right now.',
+          enterGame: 'Enter Dog Bark',
+          dogAlt: 'Dog',
+          turnOn: 'Turn on ',
+          turnOff: 'Turn off ',
+          switchLanguage: '切换为中文',
+          languageButton: '中文',
+        },
+      };
+      const languageToggles = document.querySelectorAll('.language-toggle');
+      let locale = 'zh';
+
+      function getStoredLocale() {
+        try {
+          return window.localStorage.getItem('dagoujiao-locale');
+        } catch (_) {
+          return null;
+        }
+      }
+
+      function t(key) {
+        return translations[locale][key] || translations.zh[key] || key;
+      }
+
+      function applyLanguage(nextLocale) {
+        locale = nextLocale === 'en' ? 'en' : 'zh';
+        document.documentElement.lang = locale === 'zh' ? 'zh-CN' : 'en';
+        document.title = t('pageTitle');
+        document.querySelectorAll('[data-i18n]').forEach((element) => {
+          element.textContent = t(element.dataset.i18n);
+        });
+        document.querySelectorAll('[data-i18n-aria-label]').forEach((element) => {
+          element.setAttribute('aria-label', t(element.dataset.i18nAriaLabel));
+        });
+        document.getElementById('dog-close').alt = t('dogAlt');
+        languageToggles.forEach((toggle) => {
+          toggle.setAttribute('aria-label', t('switchLanguage'));
+          toggle.title = t('switchLanguage');
+          toggle.querySelector('.language-label').textContent = t('languageButton');
+        });
+        try {
+          window.localStorage.setItem('dagoujiao-locale', locale);
+        } catch (_) {
+          // Language choice remains active for this page even when storage is unavailable.
+        }
+        document.dispatchEvent(new CustomEvent('dagou:languagechange'));
+      }
+
+      window.dagouI18n = {
+        t,
+        getLocale: () => locale,
+      };
+
+      const savedLocale = getStoredLocale();
+      const browserLocale = navigator.language && navigator.language.toLowerCase().startsWith('zh') ? 'zh' : 'en';
+      applyLanguage(savedLocale === 'en' || savedLocale === 'zh' ? savedLocale : browserLocale);
+      languageToggles.forEach((toggle) => {
+        toggle.addEventListener('click', () => {
+          applyLanguage(locale === 'zh' ? 'en' : 'zh');
+        });
+      });
+    })();
+
     const welcomeAd = document.getElementById('welcome-ad');
     const welcomeEnter = document.getElementById('welcome-enter');
     welcomeAd.addEventListener('pointerdown', (event) => event.stopPropagation());

@@ -1,22 +1,32 @@
-# 大狗叫
+# Dog Bark
 
-一个可以点击、拖动互动的大狗叫静态网页，首次进入会展示 LovBrowser 欢迎页，并包含狗叫音效、弹性缩放和全屏粒子特效。
+English | [中文](./README_CN.md)
 
-线上演示：[https://fuck-claude.ai/?a=openai-niubility](https://fuck-claude.ai/?a=openai-niubility)
+An interactive dog-bark webpage with Chinese and English UI, dog-bark sound effects, elastic scaling, and full-screen particle effects.
 
-![大狗叫预览](./preview.png)
+## Live demo
 
-## 本地运行
+[https://fuck-claude.ai/?a=openai-niubility](https://fuck-claude.ai/?a=openai-niubility)
+
+![Dog Bark preview](./preview.png)
+
+## Run locally
 
 ```bash
 python3 -m http.server 4173
 ```
 
-然后打开 [http://127.0.0.1:4173/](http://127.0.0.1:4173/)。首次点击用于解锁浏览器音频，之后点击或拖动页面即可触发叫声与视觉特效。
+Then open [http://127.0.0.1:4173/](http://127.0.0.1:4173/). The first interaction unlocks browser audio; afterwards, click or drag anywhere to trigger the bark and visual effects.
 
-## 文件结构
+## Project structure
 
-- `index.html`：页面结构与样式
-- `main.js`：音频、动画和交互逻辑
-- `audio-data.js`：内嵌狗叫音频数据
-- `Image/`：闭嘴与张嘴状态素材
+| Path | Description |
+| --- | --- |
+| `index.html` | Page structure, styles, and translations |
+| `main.js` | Audio, animation, and interaction logic |
+| `audio-data.js` | Embedded dog-bark audio data |
+| `Image/` | Closed- and open-mouth artwork |
+
+## License
+
+This project uses the [MIT License](./LICENSE), followed by a non-restrictive additional notice.
