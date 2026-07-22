@@ -20,7 +20,3 @@ python3 -m http.server 4173
 - `main.js`：音频、动画和交互逻辑
 - `audio-data.js`：内嵌狗叫音频数据
 - `Image/`：闭嘴与张嘴状态素材
-
-## 素材来源
-
-页面视觉与音频素材参考并复用于 Bilibili 玩具页：[大狗 Tap](https://www.bilibili.com/toy/Dagou-Tap/index.html)。使用或再发布前请确认相关素材授权。
