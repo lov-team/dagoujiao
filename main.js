@@ -15,6 +15,8 @@ const SPB = 60 / BPM;     // 每拍秒数
 const S16 = SPB / 4;      // 16 分音符（调度步长）
 const S8  = SPB / 2;      // 8 分音符（点击量化的最小节奏点）
 const MASTER_GAIN = 0.85;
+const MILESTONE_CLICK_INTERVAL = 20;
+const MILESTONE_DUCK_GAIN = 0.09;
 
 /* ---------- 全局状态 ---------- */
 let ctx = null;           // AudioContext
@@ -99,6 +101,8 @@ const PROJECT_URL = 'https://github.com/lov-team/dagoujiao';
 const NAVIGATION_MUTE_KEY = 'dagou-navigation-muted';
 let controlsIdleTimer = 0;
 let navigationMuted = false;
+let milestoneVideoPlaying = false;
+let milestoneRetryArmed = false;
 
 try {
   navigationMuted =
@@ -128,6 +132,11 @@ const githubModal = document.getElementById('github-modal');
 const githubModalOpen = document.getElementById('github-modal-open');
 const githubModalClose = document.getElementById('github-modal-close');
 const authorLink = document.getElementById('author-link');
+const milestoneVideoLayer = document.getElementById('milestone-video-layer');
+const milestoneVideo = document.getElementById('milestone-video');
+const milestoneCounter = window.dagouMilestoneVideo.createMilestoneCounter(
+  MILESTONE_CLICK_INTERVAL
+);
 const reduceUiMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 let projectInteractionCount = 0;
 let projectPromptShown = false;
@@ -184,6 +193,63 @@ function setNavigationMute(muted) {
 function restoreAfterNavigation() {
   if (navigationMuted) setNavigationMute(false);
 }
+
+function setMilestoneAudioDuck(ducked) {
+  if (!ctx || !master) return;
+  const now = ctx.currentTime;
+  const target = navigationMuted
+    ? 0
+    : ducked
+      ? MASTER_GAIN * MILESTONE_DUCK_GAIN
+      : MASTER_GAIN;
+  master.gain.cancelScheduledValues(now);
+  master.gain.setTargetAtTime(target, now, ducked ? 0.025 : 0.06);
+}
+
+function finishMilestoneVideo(retryOnNextClick = false) {
+  if (retryOnNextClick && milestoneRetryArmed) {
+    milestoneCounter.retryMilestone();
+  }
+  milestoneRetryArmed = false;
+  milestoneVideoPlaying = false;
+  milestoneVideo.pause();
+  milestoneVideo.currentTime = 0;
+  milestoneVideoLayer.classList.remove('is-visible');
+  milestoneVideoLayer.setAttribute('aria-hidden', 'true');
+  setMilestoneAudioDuck(false);
+  hideControlsUntilIdle();
+}
+
+function playMilestoneVideo() {
+  milestoneVideoPlaying = true;
+  milestoneRetryArmed = true;
+  inputQueue.length = 0;
+  clearInputVisualTimers();
+  for (const pointerId of pointers.keys()) {
+    try { stage.releasePointerCapture(pointerId); } catch (_) { /* 指针可能已经释放 */ }
+  }
+  pointers.clear();
+  for (const voice of [...liveVoices]) forceStopVoice(voice);
+  milestoneVideoLayer.classList.add('is-visible');
+  milestoneVideoLayer.setAttribute('aria-hidden', 'false');
+  topControls.classList.remove('is-visible');
+  setMilestoneAudioDuck(true);
+  milestoneVideo.currentTime = 0;
+
+  const playback = milestoneVideo.play();
+  if (playback) {
+    playback.catch((error) => {
+      console.warn('[大狗Tap] 里程碑视频播放失败。', error);
+      finishMilestoneVideo(true);
+    });
+  }
+}
+
+milestoneVideo.addEventListener('ended', () => finishMilestoneVideo(false));
+milestoneVideo.addEventListener('error', () => finishMilestoneVideo(true));
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden && milestoneVideoPlaying) finishMilestoneVideo(false);
+});
 
 function uiText(key) {
   if (window.dagouI18n && typeof window.dagouI18n.t === 'function') {
@@ -2188,6 +2254,7 @@ function tryActivate(pointerId, x, y, state) {
 
 stage.addEventListener('pointerdown', (e) => {
   e.preventDefault();
+  if (milestoneVideoPlaying) return;
   if (!started || !buffers.da) {
     pointers.set(e.pointerId, {
       zone: -1,
@@ -2202,6 +2269,10 @@ stage.addEventListener('pointerdown', (e) => {
     return;
   }
   if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+  if (milestoneCounter.registerClick()) {
+    playMilestoneVideo();
+    return;
+  }
   spawnClaudeText(e.clientX, e.clientY);
   recordProjectInteraction();
   try { stage.setPointerCapture(e.pointerId); } catch (_) { /* 某些旧浏览器不支持 */ }
@@ -2212,6 +2283,7 @@ stage.addEventListener('pointerdown', (e) => {
 }, { passive: false });
 
 stage.addEventListener('pointermove', (e) => {
+  if (milestoneVideoPlaying) return;
   if (!pointers.has(e.pointerId)) return;
   if (!started || !buffers.da) return;
   e.preventDefault();
