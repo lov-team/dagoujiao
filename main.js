@@ -225,6 +225,10 @@ function playMilestoneVideo() {
   milestoneRetryArmed = true;
   inputQueue.length = 0;
   clearInputVisualTimers();
+  for (const pointerId of pointers.keys()) {
+    try { stage.releasePointerCapture(pointerId); } catch (_) { /* 指针可能已经释放 */ }
+  }
+  pointers.clear();
   for (const voice of [...liveVoices]) forceStopVoice(voice);
   milestoneVideoLayer.classList.add('is-visible');
   milestoneVideoLayer.setAttribute('aria-hidden', 'false');
@@ -2279,6 +2283,7 @@ stage.addEventListener('pointerdown', (e) => {
 }, { passive: false });
 
 stage.addEventListener('pointermove', (e) => {
+  if (milestoneVideoPlaying) return;
   if (!pointers.has(e.pointerId)) return;
   if (!started || !buffers.da) return;
   e.preventDefault();

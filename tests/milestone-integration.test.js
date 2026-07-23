@@ -42,3 +42,28 @@ test('counts every twenty valid stage clicks and suppresses gameplay during play
   assert.match(main, /milestoneCounter\.registerClick\(\)/);
   assert.match(main, /if \(milestoneVideoPlaying\)/);
 });
+
+test('starts counting only after the initialization click has returned', () => {
+  const pointerHandler = main.indexOf("stage.addEventListener('pointerdown'");
+  const initializationGuard = main.indexOf('if (!started || !buffers.da)', pointerHandler);
+  const milestoneRegistration = main.indexOf('milestoneCounter.registerClick()', pointerHandler);
+  const initializationBlock = main.slice(initializationGuard, milestoneRegistration);
+
+  assert.ok(pointerHandler >= 0);
+  assert.ok(initializationGuard > pointerHandler);
+  assert.match(initializationBlock, /start\(\);[\s\S]*return;/);
+  assert.ok(milestoneRegistration > initializationGuard);
+});
+
+test('cancels captured pointers and blocks pointer moves during playback', () => {
+  const playStart = main.indexOf('function playMilestoneVideo()');
+  const playEnd = main.indexOf("milestoneVideo.addEventListener('ended'", playStart);
+  const playBody = main.slice(playStart, playEnd);
+  const moveStart = main.indexOf("stage.addEventListener('pointermove'");
+  const moveEnd = main.indexOf("stage.addEventListener('pointerup'", moveStart);
+  const moveBody = main.slice(moveStart, moveEnd);
+
+  assert.match(playBody, /releasePointerCapture/);
+  assert.match(playBody, /pointers\.clear\(\)/);
+  assert.match(moveBody, /if \(milestoneVideoPlaying\) return;/);
+});
