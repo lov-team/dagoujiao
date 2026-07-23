@@ -92,7 +92,6 @@ let lastCommittedInputTime = -Infinity;
 const pointers = new Map();// pointerId -> { zone, voice, pendingEntryId, lastX, lastY }
 const CONTROLS_IDLE_MS = 2000;
 const CONTROLS_HOVER_IDLE_MS = 250;
-const PROJECT_INTERACTION_TARGET = 20;
 const CREATOR_MID = '357762853';
 const CREATOR_URL = `https://space.bilibili.com/${CREATOR_MID}`;
 const FEATURED_BVID = 'BV1kNKU6REBg';
@@ -128,9 +127,6 @@ const sfxToggle = document.getElementById('sfx-toggle');
 const languageToggle = document.getElementById('language-toggle');
 const githubButton = document.getElementById('github-button');
 const videoButton = document.getElementById('video-button');
-const githubModal = document.getElementById('github-modal');
-const githubModalOpen = document.getElementById('github-modal-open');
-const githubModalClose = document.getElementById('github-modal-close');
 const authorLink = document.getElementById('author-link');
 const milestoneVideoLayer = document.getElementById('milestone-video-layer');
 const milestoneVideo = document.getElementById('milestone-video');
@@ -138,8 +134,6 @@ const milestoneCounter = window.dagouMilestoneVideo.createMilestoneCounter(
   MILESTONE_CLICK_INTERVAL
 );
 const reduceUiMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-let projectInteractionCount = 0;
-let projectPromptShown = false;
 
 function showControls() {
   if (pointers.size > 0 || holding) return;
@@ -381,25 +375,6 @@ function openProjectOnGitHub() {
   openExternal(PROJECT_URL);
 }
 
-function closeProjectPrompt() {
-  githubModal.hidden = true;
-  githubButton.focus();
-}
-
-function showProjectPrompt() {
-  projectPromptShown = true;
-  githubModal.hidden = false;
-  githubModalOpen.focus();
-}
-
-function recordProjectInteraction() {
-  if (projectPromptShown) return;
-  projectInteractionCount += 1;
-  if (projectInteractionCount >= PROJECT_INTERACTION_TARGET) {
-    showProjectPrompt();
-  }
-}
-
 for (const button of topControls.querySelectorAll('button')) {
   button.addEventListener('pointerenter', (event) => {
     if (event.pointerType === 'mouse') accelerateControlsReveal();
@@ -420,12 +395,6 @@ musicToggle.addEventListener('click', toggleMusic);
 sfxToggle.addEventListener('click', toggleSoundEffects);
 githubButton.addEventListener('click', openProjectOnGitHub);
 videoButton.addEventListener('click', openFeaturedVideo);
-githubModal.addEventListener('pointerdown', (event) => event.stopPropagation());
-githubModalOpen.addEventListener('click', openProjectOnGitHub);
-githubModalClose.addEventListener('click', closeProjectPrompt);
-window.addEventListener('keydown', (event) => {
-  if (event.key === 'Escape' && !githubModal.hidden) closeProjectPrompt();
-});
 document.addEventListener('dagou:languagechange', () => {
   updateMuteButton(musicToggle, bgmMuted, 'music');
   updateMuteButton(sfxToggle, sfxMuted, 'soundEffects');
@@ -2255,6 +2224,7 @@ function tryActivate(pointerId, x, y, state) {
 stage.addEventListener('pointerdown', (e) => {
   e.preventDefault();
   if (milestoneVideoPlaying) return;
+  const milestoneReached = milestoneCounter.registerClick();
   if (!started || !buffers.da) {
     pointers.set(e.pointerId, {
       zone: -1,
@@ -2265,16 +2235,18 @@ stage.addEventListener('pointerdown', (e) => {
     });
     hideControlsUntilIdle();
     start();
-    recordProjectInteraction();
+    if (milestoneReached) {
+      playMilestoneVideo();
+      return;
+    }
     return;
   }
   if (ctx.state === 'suspended') ctx.resume().catch(() => {});
-  if (milestoneCounter.registerClick()) {
+  if (milestoneReached) {
     playMilestoneVideo();
     return;
   }
   spawnClaudeText(e.clientX, e.clientY);
-  recordProjectInteraction();
   try { stage.setPointerCapture(e.pointerId); } catch (_) { /* 某些旧浏览器不支持 */ }
   pointers.set(
     e.pointerId,
