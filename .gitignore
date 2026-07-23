@@ -1,2 +1,5 @@
 .DS_Store
 ._*
+node_modules/
+media/click-20/reference.jpg
+media/click-20/previews/

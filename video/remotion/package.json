@@ -1,0 +1,15 @@
+{
+  "name": "dagoujiao-click-20-video",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test src/*.test.js",
+    "render": "remotion render src/index.jsx Click20Dog ../../media/click-20/remotion-render.mp4 --codec=h264 --pixel-format=yuv420p --public-dir=../../media/click-20 && node scripts/normalize.mjs remotion"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.496",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "remotion": "4.0.496"
+  }
+}

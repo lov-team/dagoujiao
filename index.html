@@ -203,6 +203,36 @@
   }
   #dog-inner.bark-image #dog-open { opacity: 1; }
 
+  /* 每 20 次有效点击出现的 3 秒成片。横屏素材完整显示，竖屏设备用米白补边。 */
+  #milestone-video-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 45;
+    display: grid;
+    place-items: center;
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    background: var(--cream);
+    transition: opacity .12s linear, visibility .12s linear;
+  }
+  #milestone-video-layer.is-visible {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+  }
+  #milestone-video {
+    position: absolute;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    display: block;
+    object-fit: contain;
+    object-position: center center;
+    background: var(--cream);
+  }
+
   /* 顶部控制：互动时隐藏，闲置 2 秒后由 JS 淡入 */
   #top-controls {
     position: absolute;
@@ -532,6 +562,16 @@
     <div id="zoneflash"></div>
     <div id="click-text-layer" aria-hidden="true"></div>
 
+    <div id="milestone-video-layer" aria-hidden="true">
+      <video
+        id="milestone-video"
+        src="media/click-20.mp4?v=20260723-bite-2"
+        preload="auto"
+        playsinline
+        webkit-playsinline
+      ></video>
+    </div>
+
     <div id="dog">
       <div id="dog-inner">
         <div id="dog-jelly">
@@ -731,6 +771,7 @@
     });
   </script>
   <script src="audio-data.js"></script>
-  <script src="main.js?v=39c3d06"></script>
+  <script src="milestone-video.js?v=20260723-click20"></script>
+  <script src="main.js?v=20260723-click20"></script>
 </body>
 </html>
