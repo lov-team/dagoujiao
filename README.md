@@ -6,7 +6,7 @@ An interactive dog-bark webpage with Chinese and English UI, dog-bark sound effe
 
 ## Live demo
 
-[https://fuck-claude.ai/?a=openai-niubility](https://fuck-claude.ai/?a=openai-niubility)
+[大狗叫 / Dog Bark](https://fuck-claude.ai/?a=openai-niubility)
 
 ![Dog Bark preview](./preview.png)
 
@@ -20,12 +20,12 @@ Then open [http://127.0.0.1:4173/](http://127.0.0.1:4173/). The first interactio
 
 ## Project structure
 
-| Path | Description |
-| --- | --- |
-| `index.html` | Page structure, styles, and translations |
-| `main.js` | Audio, animation, and interaction logic |
-| `audio-data.js` | Embedded dog-bark audio data |
-| `Image/` | Closed- and open-mouth artwork |
+| Path            | Description                              |
+| --------------- | ---------------------------------------- |
+| `index.html`    | Page structure, styles, and translations |
+| `main.js`       | Audio, animation, and interaction logic  |
+| `audio-data.js` | Embedded dog-bark audio data             |
+| `Image/`        | Closed- and open-mouth artwork           |
 
 ## Acknowledgments
 
