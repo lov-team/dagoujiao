@@ -43,16 +43,21 @@ test('counts every twenty valid stage clicks and suppresses gameplay during play
   assert.match(main, /if \(milestoneVideoPlaying\)/);
 });
 
-test('starts counting only after the initialization click has returned', () => {
+test('counts the initialization click toward the twentieth stage click', () => {
   const pointerHandler = main.indexOf("stage.addEventListener('pointerdown'");
   const initializationGuard = main.indexOf('if (!started || !buffers.da)', pointerHandler);
   const milestoneRegistration = main.indexOf('milestoneCounter.registerClick()', pointerHandler);
-  const initializationBlock = main.slice(initializationGuard, milestoneRegistration);
 
   assert.ok(pointerHandler >= 0);
   assert.ok(initializationGuard > pointerHandler);
-  assert.match(initializationBlock, /start\(\);[\s\S]*return;/);
-  assert.ok(milestoneRegistration > initializationGuard);
+  assert.ok(milestoneRegistration > pointerHandler);
+  assert.ok(milestoneRegistration < initializationGuard);
+});
+
+test('uses the twentieth interaction for video without an automatic GitHub prompt', () => {
+  assert.doesNotMatch(html, /id="github-modal"/);
+  assert.doesNotMatch(main, /recordProjectInteraction/);
+  assert.doesNotMatch(main, /PROJECT_INTERACTION_TARGET/);
 });
 
 test('cancels captured pointers and blocks pointer moves during playback', () => {
